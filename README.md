@@ -18,10 +18,10 @@ Follow these steps to get started with the project:
 
 1. Clone the repository to your local machine:
 
-   git clone [https://github.com/your-username/your-project.git](https://github.com/vladimirsalbut/VladimirSalbut_Omega_CoffeeShop.git)
+   git clone https://github.com/vladimirsalbut/VladimirSalbut_Omega_CoffeeShop.git
 
-2. Navigate to the CoffeeShop.Api project directory and run following command to build and run backend part of application:
+2. Navigate to the CoffeeShop.Api project directory and run the following command to build and run the backend part of the application:
 
    dotnet run
 
-3. To run frontend part navigate to the CoffeeShop.Frontend and open index.html in your browser.
+3. To run the frontend part navigate to the CoffeeShop.Frontend directory and open index.html in your browser.
