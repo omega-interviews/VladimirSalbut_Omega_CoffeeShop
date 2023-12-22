@@ -1,0 +1,82 @@
+<div id="app">
+    <header>
+        <h1>Coffee Shop</h1>
+    </header>
+
+    <div class="coffee-container">
+        <div v-for="coffee in coffees" class="coffee-item" @click="orderCoffe(coffee)">
+            <img class="coffee-img" :src="coffee.picture" :alt="coffee.type">
+            <div class="coffee-details">
+                <h2>{{ coffee.type }}</h2>
+                <span>${{ coffee.price }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="main.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js" integrity="sha512-b94Z6431JyXY14iSXwgzeZurHHRNkLt9d6bAHt7BZT38eqV+GyngIi/tVye4jBKPYQ2lBdRs0glww4fmpuLRwA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://unpkg.com/vue-dk-toast@3.2.1"></script>
+<script type="module">
+  import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+  const API_URI = "http://localhost:5107/"
+
+  createApp({
+    data() {
+      return {
+        coffees: [],
+        orders: [],
+        interval: null
+      }
+    },
+    methods:{
+        async fetchCoffees(){
+            axios.get(API_URI + "api/coffees").then(
+                (response) => {
+                    this.coffees = response.data;
+                }
+            )
+        },
+        async orderCoffe(coffee){
+            const payload = {
+                coffeeId: coffee.id,
+                orderType: "AtTable"
+            };
+            axios.post(API_URI + "api/orders", payload).then(
+                (response) => {
+                    this.orders.push(response.data.orderId)
+                    alert(`${coffee.type} has been successfully ordered!`)
+                }).catch(
+                    function (error) {
+                        alert(`Sorry, ${coffee.type} cannot be ordered.`)
+                    }
+                )
+        },
+        async checkOrders(){
+            if(this.orders.length > 0){
+                this.orders.forEach((orderId) => {
+                    axios.get(API_URI + "api/orders/" + orderId).then(
+                        (response) => {
+                            let order = response.data;
+                            if(order.isCompleted){
+                                this.orders.splice(this.orders.indexOf(orderId), 1);
+                                alert(`Your ${order.coffeeType} is finished.`)
+                            }
+                        }
+                    )
+                })
+            }
+        }
+    },
+    mounted(){
+        this.fetchCoffees();
+    },
+    created(){
+        //Check if the ordered order is ready every 3 seconds by calling the 
+        //endpoint to retrieve the order. In a real-life application, this should be handled through sockets.
+        this.interval = setInterval(() => {
+        this.checkOrders()}, 3000)
+    },
+  }).mount('#app')
+</script>
